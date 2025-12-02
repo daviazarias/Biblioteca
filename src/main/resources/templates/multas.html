@@ -57,11 +57,11 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Gerenciar Multas</h2>
         <div class="header-actions">
-            <button aria-label="Processar Multas Agora" class="btn btn-outline-secondary" onclick="processarMultas()"
+            <button aria-label="Processar Multas Agora" class="btn btn-outline-secondary" onclick="MultasApp.processarMultas()"
                     title="Processar Multas Agora">
                 <i class="bi bi-gear"></i>
             </button>
-            <select class="form-select w-auto" id="filtroStatus" onchange="carregarMultas()" title="Filtrar por status">
+            <select class="form-select w-auto" id="filtroStatus" onchange="MultasApp.carregarMultas()" title="Filtrar por status">
                 <option value="">Todos</option>
                 <option value="PENDENTE">Pendentes</option>
                 <option value="PAGA">Pagas</option>

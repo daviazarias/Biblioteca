@@ -20,7 +20,7 @@ public interface LivroRepository extends JpaRepository<Livro, Long> {
     List<Livro> buscarPorTituloOuAutor(@Param("termo") String termo);
 
     @Query(value = """
-            SELECT l.*, c.nome as categoria_nome, COUNT(e.id_emprestimo) as total_emprestimos
+            SELECT l.titulo, c.nome as categoria_nome, COUNT(e.id_emprestimo) as total_emprestimos
             FROM livro l
             LEFT JOIN livro_categoria lc ON l.id_livro = lc.id_livro
             LEFT JOIN categoria c ON lc.id_categoria = c.id_categoria

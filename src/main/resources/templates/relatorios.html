@@ -223,7 +223,7 @@
                 html += '<thead><tr><th>Livro</th><th>Categoria</th><th>Total Empréstimos</th></tr></thead><tbody>';
 
                 data.forEach(row => {
-                    const titulo = row[2] || 'N/A';
+                    const titulo = row[0] || 'N/A';
                     const categoria = row[row.length - 2] || 'Sem categoria';
                     const total = row[row.length - 1] || 0;
                     html += `<tr><td>${titulo}</td><td>${categoria}</td>

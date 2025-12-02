@@ -345,6 +345,14 @@ Execute o script SQL manualmente ou verifique `spring.jpa.hibernate.ddl-auto=upd
 
 Sistema desenvolvido para trabalho prático de Banco de Dados.
 
+| Nome | RA |
+|------|------|
+| João Antonio Lassister Melo | 2024.1.08.027 |
+| Davi Azarias do Vale Cabral | 2024.1.08.006 |
+| Renan Catini Amaral | 2024.1.08.042 |
+| Luis Renato Goulart | 2023.1.08.049 |
+| João Antonio Siqueira Pascuini | 2024.1.08.028 |
+
 ## Licença
 
 Este projeto é de código aberto para fins educacionais.

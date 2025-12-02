@@ -120,8 +120,8 @@
                 html += '<thead><tr><th>Título</th><th>Autor</th><th>Total Empréstimos</th></tr></thead><tbody>';
 
                 data.forEach(row => {
-                    const titulo = row[2] || 'N/A';
-                    const autor = row[3] || 'N/A';
+                    const titulo = row[7] || 'N/A';
+                    const autor = row[2] || 'N/A';
                     const total = row[row.length - 1] || 0;
                     html += `<tr><td>${titulo}</td><td>${autor}</td><td><span class="badge bg-primary">${total}</span></td></tr>`;
                 });

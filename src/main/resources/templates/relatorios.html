@@ -169,7 +169,7 @@
                 data.forEach(row => {
                     const usuario = row[row.length - 3] || 'N/A';
                     const livro = row[row.length - 2] || 'N/A';
-                    const dataPrev = row[4] ? new Date(row[4]).toLocaleDateString('pt-BR') : 'N/A';
+                    const dataPrev = row[0] ? new Date(row[0]).toLocaleDateString('pt-BR') : 'N/A';
                     const diasAtraso = row[row.length - 1] || 0;
                     html += `<tr><td>${usuario}</td><td>${livro}</td><td>${dataPrev}</td>
                                 <td><span class="badge bg-danger">${diasAtraso} dias</span></td></tr>`;

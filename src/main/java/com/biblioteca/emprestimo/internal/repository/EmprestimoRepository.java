@@ -24,7 +24,7 @@ public interface EmprestimoRepository extends JpaRepository<Emprestimo, Long> {
     );
 
     @Query(value = """
-            SELECT e.*, u.nome as usuario_nome, l.titulo as livro_titulo, DATEDIFF(CURRENT_DATE, e.data_devolucao_prevista) as dias_atraso
+            SELECT e.data_devolucao_prevista, u.nome as usuario_nome, l.titulo as livro_titulo, DATEDIFF(CURRENT_DATE, e.data_devolucao_prevista) as dias_atraso
             FROM emprestimo e
             INNER JOIN usuario u ON e.id_usuario = u.id_usuario
             INNER JOIN livro l ON e.id_livro = l.id_livro

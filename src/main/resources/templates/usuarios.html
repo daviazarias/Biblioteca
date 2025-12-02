@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Usuários - Sistema de Biblioteca</title>
+    <link href="/webjars/bootstrap/5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/webjars/bootstrap-icons/1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gerenciar Usuários</h2>
+        <button aria-label="Novo Usuário" class="btn btn-primary" onclick="abrirModalNovo()" title="Novo Usuário">
+            <i class="bi bi-plus-circle"></i>
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Tipo</th>
+                    <th>Data Cadastro</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody id="tabelaUsuarios">
+                <tr>
+                    <td class="text-center" colspan="7">Carregando...</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Novo Usuário -->
+<div class="modal fade" id="modalNovoUsuario" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalUsuarioTitulo">Novo Usuário</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNovoUsuario">
+                    <input id="usuarioId" name="id" type="hidden">
+                    <div class="mb-3">
+                        <label class="form-label" for="nome" >Nome</label>
+                        <input class="form-control" name="nome" id="nome" required type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="email">Email</label>
+                        <input class="form-control" name="email" id="email" required type="email">
+                    </div>
+                    <div class="mb-3" id="campoSenha">
+                        <label class="form-label" for="senha">Senha</label>
+                        <input class="form-control" id="senha" name="senha" type="password">
+                        <small class="text-muted" id="senhaHint" style="display: none;">Deixe em branco para manter a
+                            senha atual</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="tipoUsuario">Tipo</label>
+                        <select class="form-select" name="tipoUsuario" id="tipoUsuario" required>
+                            <option value="USUARIO">Usuário</option>
+                            <option value="ADMIN">Administrador</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="campoStatus" style="display: none;">
+                        <label class="form-label" for="ativo">Status</label>
+                        <select class="form-select" id="ativo" name="ativo">
+                            <option value="true">Ativo</option>
+                            <option value="false">Inativo</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button aria-label="Cancelar" class="btn btn-secondary" data-bs-dismiss="modal" title="Cancelar"
+                        type="button">
+                    <i class="bi bi-x"></i>
+                </button>
+                <button aria-label="Salvar" class="btn btn-primary" id="btnSalvarUsuario" onclick="salvarUsuario()"
+                        title="Salvar" type="button">
+                    <i class="bi bi-save"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/webjars/bootstrap/5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/usuarios.js"></script>
+</body>
+</html>

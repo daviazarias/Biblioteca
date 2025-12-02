@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Livros - Sistema de Biblioteca</title>
+    <link href="/webjars/bootstrap/5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/webjars/bootstrap-icons/1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gerenciar Livros</h2>
+        <button aria-label="Novo Livro" class="btn btn-primary" onclick="abrirModalNovoLivro()" title="Novo Livro">
+            <i class="bi bi-plus-circle"></i>
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>ISBN</th>
+                    <th>Ano</th>
+                    <th>Disponíveis</th>
+                    <th>Total</th>
+                    <th>Categorias</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody id="tabelaLivros">
+                <tr>
+                    <td class="text-center" colspan="8">Carregando...</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Novo Livro -->
+<div class="modal fade" id="modalNovoLivro" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLivroTitulo">Novo Livro</h5>
+                <button aria-label="Fechar" class="btn-close" data-bs-dismiss="modal" title="Fechar"
+                        type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNovoLivro">
+                    <input id="livroId" name="id" type="hidden">
+                    <div class="mb-3">
+                        <label class="form-label" for="titulo">Título</label>
+                        <input class="form-control" name="titulo" id="titulo" required type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="autor">Autor</label>
+                        <input class="form-control" name="autor" id="autor" required type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="isbn">ISBN</label>
+                        <input class="form-control" id="isbn" name="isbn" pattern="[0-9-]+" required type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="anoPublicacao">Ano de Publicação</label>
+                        <input class="form-control" id="anoPublicacao" max="2100" min="1000" name="anoPublicacao"
+                               required type="number">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="quantidadeDisponivel">Quantidade Disponível</label>
+                        <input class="form-control" min="0" name="quantidadeDisponivel" id="quantidadeDisponivel"
+                               required type="number">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="selectCategorias">Categorias</label>
+                        <select class="form-select" id="selectCategorias" multiple name="categorias"></select>
+                        <small class="text-muted">Segure Ctrl para selecionar múltiplas</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button aria-label="Cancelar" class="btn btn-secondary" data-bs-dismiss="modal" title="Cancelar"
+                        type="button">
+                    <i class="bi bi-x"></i>
+                </button>
+                <button aria-label="Salvar" class="btn btn-primary" id="btnSalvarLivro" onclick="salvarLivro()"
+                        title="Salvar"
+                        type="button">
+                    <i class="bi bi-save"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/webjars/bootstrap/5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function carregarLivros() {
+        fetch('/api/livros')
+            .then(response => response.json())
+            .then(livros => {
+                const tbody = document.getElementById('tabelaLivros');
+                tbody.innerHTML = '';
+
+                livros.forEach(livro => {
+                    const tr = document.createElement('tr');
+                    const categorias = Array.from(livro.categorias).join(', ');
+                    tr.innerHTML = `
+                            <td>${livro.idLivro}</td>
+                            <td>${livro.titulo}</td>
+                            <td>${livro.autor}</td>
+                            <td>${livro.isbn}</td>
+                            <td>${livro.anoPublicacao}</td>
+                            <td><span class="badge ${livro.disponivelParaEmprestimo > 0 ? 'bg-success' : 'bg-danger'}">
+                                ${livro.disponivelParaEmprestimo}
+                            </span></td>
+                            <td><span class="badge bg-info">${livro.quantidadeTotal || 0}</span></td>
+                            <td><small>${categorias || 'Sem categoria'}</small></td>
+                            <td>
+                                <button class="btn btn-sm btn-warning me-1" onclick="editarLivro(${livro.idLivro})" title="Editar" aria-label="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deletarLivro(${livro.idLivro})" title="Excluir" aria-label="Excluir">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        `;
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao carregar livros');
+            });
+    }
+
+    function carregarCategorias() {
+        fetch('/api/categorias')
+            .then(response => response.json())
+            .then(categorias => {
+                const select = document.getElementById('selectCategorias');
+                select.innerHTML = '';
+                categorias.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.idCategoria;
+                    option.textContent = cat.nome;
+                    select.appendChild(option);
+                });
+            });
+    }
+
+    function abrirModalNovoLivro() {
+        document.getElementById('modalLivroTitulo').textContent = 'Novo Livro';
+        document.getElementById('formNovoLivro').reset();
+        document.getElementById('livroId').value = '';
+        document.getElementById('btnSalvarLivro').setAttribute('title', 'Salvar');
+        // Limpar seleção de categorias
+        const select = document.getElementById('selectCategorias');
+        Array.from(select.options).forEach(option => option.selected = false);
+        new bootstrap.Modal(document.getElementById('modalNovoLivro')).show();
+    }
+
+    function editarLivro(id) {
+        fetch(`/api/livros/${id}`)
+            .then(response => response.json())
+            .then(livro => {
+                document.getElementById('modalLivroTitulo').textContent = 'Editar Livro';
+                document.getElementById('livroId').value = livro.idLivro;
+                document.getElementById('titulo').value = livro.titulo;
+                document.getElementById('autor').value = livro.autor;
+                document.getElementById('isbn').value = livro.isbn;
+                document.getElementById('anoPublicacao').value = livro.anoPublicacao;
+                document.getElementById('quantidadeDisponivel').value = livro.quantidadeDisponivel;
+                document.getElementById('btnSalvarLivro').setAttribute('title', 'Atualizar');
+
+                fetch('/api/categorias')
+                    .then(response => response.json())
+                    .then(categorias => {
+                        const select = document.getElementById('selectCategorias');
+                        Array.from(select.options).forEach(option => {
+                            option.selected = livro.categorias.includes(option.text);
+                        });
+                        new bootstrap.Modal(document.getElementById('modalNovoLivro')).show();
+                    });
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao carregar livro');
+            });
+    }
+
+    function salvarLivro() {
+        const form = document.getElementById('formNovoLivro');
+        const formData = new FormData(form);
+        const id = document.getElementById('livroId').value;
+        const isEdicao = id !== '';
+
+        const selecionadas = Array.from(document.getElementById('selectCategorias').selectedOptions).map(o => parseInt(o.value));
+
+        const payload = {
+            titulo: formData.get('titulo'),
+            autor: formData.get('autor'),
+            isbn: formData.get('isbn'),
+            anoPublicacao: parseInt(formData.get('anoPublicacao')),
+            quantidadeDisponivel: parseInt(formData.get('quantidadeDisponivel')),
+            idsCategorias: selecionadas
+        };
+
+        const url = isEdicao ? `/api/livros/${id}` : '/api/livros';
+        const method = isEdicao ? 'PUT' : 'POST';
+
+        fetch(url, {method, headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)})
+            .then(resp => {
+                if (!resp.ok) throw new Error('Falha ao salvar livro');
+                return resp.json();
+            })
+            .then(() => {
+                bootstrap.Modal.getInstance(document.getElementById('modalNovoLivro')).hide();
+                carregarLivros();
+            })
+            .catch(err => alert(err.message));
+    }
+
+    function deletarLivro(id) {
+        if (!confirm('Confirma exclusão?')) return;
+        fetch(`/api/livros/${id}`, {method: 'DELETE'})
+            .then(resp => {
+                if (!resp.ok) throw new Error('Falha ao excluir');
+                carregarLivros();
+            })
+            .catch(err => alert(err.message));
+    }
+
+    carregarCategorias();
+    carregarLivros();
+</script>
+</body>
+</html>

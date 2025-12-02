@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Dashboard - Sistema de Biblioteca</title>
+    <link href="/webjars/bootstrap/5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/webjars/bootstrap-icons/1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Dashboard</h2>
+
+    <div class="row" id="statsCards">
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-people"></i> Usuários
+                    </h5>
+                    <h2 class="mb-0" id="totalUsuarios">-</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-book"></i> Livros
+                    </h5>
+                    <h2 class="mb-0" id="totalLivros">-</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-arrow-repeat"></i> Empréstimos Ativos
+                    </h5>
+                    <h2 class="mb-0" id="totalEmprestimosAtivos">-</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-exclamation-triangle"></i> Atrasados
+                    </h5>
+                    <h2 class="mb-0" id="totalEmprestimosAtrasados">-</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Bem-vindo ao Sistema de Biblioteca</h5>
+                </div>
+                <div class="card-body">
+                    <p>Use o menu superior para navegar entre as funcionalidades:</p>
+                    <ul>
+                        <li><strong>Usuários:</strong> Gerenciar cadastro de usuários</li>
+                        <li><strong>Livros:</strong> Adicionar, editar e remover livros do acervo</li>
+                        <li><strong>Empréstimos:</strong> Registrar empréstimos e devoluções</li>
+                        <li><strong>Relatórios:</strong> Visualizar consultas complexas e estatísticas</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/webjars/bootstrap/5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/dashboard.js"></script>
+</body>
+</html>

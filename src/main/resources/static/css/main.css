@@ -1,0 +1,68 @@
+/* Sistema de Biblioteca - Estilos Globais */
+
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+}
+
+/* Cards Modernos */
+.card-modern {
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+/* Botão Gradiente */
+.btn-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+}
+
+.btn-gradient:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+    color: white;
+}
+
+/* Accordion */
+.accordion-button {
+    transition: background-color 0.3s;
+}
+
+.accordion-button:hover {
+    background-color: #f1f1f1;
+}
+
+/* Badges */
+.badge-status {
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* Tabelas */
+.table-modern {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Cards de Filtro */
+.filter-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Header Actions */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-pay-all {
+    margin-left: auto;
+}
+

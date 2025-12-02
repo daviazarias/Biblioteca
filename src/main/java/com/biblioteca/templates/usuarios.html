@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Usuários - Sistema de Biblioteca</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .card-modern {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+        }
+
+        .table-modern thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold"><i class="bi bi-people-fill text-primary"></i> Gerenciar Usuários</h2>
+            <p class="text-muted">Cadastro e controle de usuários do sistema</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <button class="btn btn-gradient btn-lg" data-bs-target="#modalNovoUsuario" data-bs-toggle="modal">
+                <i class="bi bi-plus-circle"></i> Novo Usuário
+            </button>
+        </div>
+    </div>
+
+    <!-- Cards Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card card-modern text-center">
+                <div class="card-body">
+                    <i class="bi bi-people text-primary" style="font-size: 2rem;"></i>
+                    <h3 class="mt-2" id="totalUsuarios">-</h3>
+                    <p class="text-muted mb-0">Total de Usuários</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-modern text-center">
+                <div class="card-body">
+                    <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+                    <h3 class="mt-2" id="totalAtivos">-</h3>
+                    <p class="text-muted mb-0">Ativos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-modern text-center">
+                <div class="card-body">
+                    <i class="bi bi-shield-check text-info" style="font-size: 2rem;"></i>
+                    <h3 class="mt-2" id="totalAdmins">-</h3>
+                    <p class="text-muted mb-0">Administradores</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela -->
+    <div class="card card-modern">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0 table-modern">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Tipo</th>
+                    <th>Data Cadastro</th>
+                    <th>Status</th>
+                    <th class="text-center">Ações</th>
+                </tr>
+                </thead>
+                <tbody id="tabelaUsuarios">
+                <tr>
+                    <td class="text-center py-4" colspan="7">
+                        <div class="spinner-border text-primary"></div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Novo Usuário -->
+<div class="modal fade" id="modalNovoUsuario" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-header"
+                 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Novo Usuário</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNovoUsuario">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="inputNome">Nome Completo</label>
+                        <input class="form-control" id="inputNome" name="nome" required type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="inputEmail">Email</label>
+                        <input class="form-control" id="inputEmail" name="email" required type="email">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="inputSenha">Senha</label>
+                        <input class="form-control" id="inputSenha" name="senha" required type="password">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="inputTipoUsuario">Tipo de Usuário</label>
+                        <select class="form-select" id="inputTipoUsuario" name="tipoUsuario" required>
+                            <option value="USUARIO">Usuário</option>
+                            <option value="ADMIN">Administrador</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancelar</button>
+                <button class="btn btn-gradient" onclick="salvarUsuario()" type="button">
+                    <i class="bi bi-save"></i> Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Usuário -->
+<div class="modal fade" id="modalEditarUsuario" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-header bg-warning" style="border-radius: 15px 15px 0 0;">
+                <h5 class="modal-title"><i class="bi bi-pencil"></i> Editar Usuário</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarUsuario">
+                    <input id="editIdUsuario" type="hidden">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="editNome">Nome Completo</label>
+                        <input class="form-control" id="editNome" required type="text">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="editEmail">Email</label>
+                        <input class="form-control" id="editEmail" required type="email">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="editTipoUsuario">Tipo de Usuário</label>
+                        <select class="form-select" id="editTipoUsuario" required>
+                            <option value="USUARIO">Usuário</option>
+                            <option value="ADMIN">Administrador</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="editAtivo">Status</label>
+                        <select class="form-select" id="editAtivo" required>
+                            <option value="true">Ativo</option>
+                            <option value="false">Inativo</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancelar</button>
+                <button class="btn btn-warning" onclick="atualizarUsuario()" type="button">
+                    <i class="bi bi-check-lg"></i> Atualizar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function carregarUsuarios() {
+        fetch('/api/usuarios')
+            .then(response => response.json())
+            .then(usuarios => {
+                const tbody = document.getElementById('tabelaUsuarios');
+                tbody.innerHTML = '';
+
+                let ativos = 0, admins = 0;
+
+                usuarios.forEach(usuario => {
+                    if (usuario.ativo) ativos++;
+                    if (usuario.tipoUsuario === 'ADMIN') admins++;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                            <td>${usuario.idUsuario}</td>
+                            <td>${usuario.nome}</td>
+                            <td>${usuario.email}</td>
+                            <td><span class="badge bg-${usuario.tipoUsuario === 'ADMIN' ? 'danger' : 'info'}">${usuario.tipoUsuario}</span></td>
+                            <td>${new Date(usuario.dataCadastro).toLocaleDateString('pt-BR')}</td>
+                            <td>${usuario.ativo ? '<span class="badge bg-success">Ativo</span>' : '<span class="badge bg-secondary">Inativo</span>'}</td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-warning me-1" onclick="editarUsuario(${usuario.idUsuario})">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </button>
+                                ${usuario.tipoUsuario !== 'ADMIN' && usuario.ativo ?
+                        `<button class="btn btn-sm btn-danger" onclick="inativarUsuario(${usuario.idUsuario})">
+                                        <i class="bi bi-x-circle"></i> Inativar
+                                    </button>` : ''}
+                            </td>
+                        `;
+                    tbody.appendChild(tr);
+                });
+
+                if (usuarios.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4">Nenhum usuário encontrado</td></tr>';
+                }
+
+                document.getElementById('totalUsuarios').textContent = usuarios.length;
+                document.getElementById('totalAtivos').textContent = ativos;
+                document.getElementById('totalAdmins').textContent = admins;
+            });
+    }
+
+    function salvarUsuario() {
+        const form = document.getElementById('formNovoUsuario');
+        const formData = new FormData(form);
+
+        const usuario = {
+            nome: formData.get('nome'),
+            email: formData.get('email'),
+            senha: formData.get('senha'),
+            tipoUsuario: formData.get('tipoUsuario')
+        };
+
+        fetch('/api/usuarios', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(usuario)
+        })
+            .then(response => {
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('modalNovoUsuario')).hide();
+                    form.reset();
+                    carregarUsuarios();
+                    alert('Usuário criado com sucesso!');
+                } else {
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
+                }
+            })
+            .catch(error => alert('Erro: ' + error.message));
+    }
+
+    function editarUsuario(id) {
+        fetch(`/api/usuarios/${id}`)
+            .then(response => response.json())
+            .then(usuario => {
+                document.getElementById('editIdUsuario').value = usuario.idUsuario;
+                document.getElementById('editNome').value = usuario.nome;
+                document.getElementById('editEmail').value = usuario.email;
+                document.getElementById('editTipoUsuario').value = usuario.tipoUsuario;
+                document.getElementById('editAtivo').value = usuario.ativo;
+
+                new bootstrap.Modal(document.getElementById('modalEditarUsuario')).show();
+            });
+    }
+
+    function atualizarUsuario() {
+        const id = document.getElementById('editIdUsuario').value;
+        const usuario = {
+            nome: document.getElementById('editNome').value,
+            email: document.getElementById('editEmail').value,
+            tipoUsuario: document.getElementById('editTipoUsuario').value,
+            ativo: document.getElementById('editAtivo').value === 'true'
+        };
+
+        fetch(`/api/usuarios/${id}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(usuario)
+        })
+            .then(response => {
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('modalEditarUsuario')).hide();
+                    carregarUsuarios();
+                    alert('Usuário atualizado com sucesso!');
+                } else {
+                    throw new Error('Erro ao atualizar');
+                }
+            })
+            .catch(error => alert('Erro: ' + error.message));
+    }
+
+    function inativarUsuario(id) {
+        if (confirm('Deseja realmente inativar este usuário?')) {
+            fetch(`/api/usuarios/${id}`, {method: 'DELETE'})
+                .then(response => {
+                    if (response.ok) {
+                        alert('Usuário inativado!');
+                        carregarUsuarios();
+                    }
+                });
+        }
+    }
+
+    // Carregar ao iniciar
+    carregarUsuarios();
+</script>
+</body>
+</html>

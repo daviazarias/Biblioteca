@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Reservas - Sistema de Biblioteca</title>
+    <link href="/webjars/bootstrap/5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/webjars/bootstrap-icons/1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .card-modern {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold"><i class="bi bi-bookmark text-primary"></i> Gerenciar Reservas</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <button aria-label="Nova Reserva" class="btn btn-gradient btn-lg" onclick="abrirModalNova()"
+                    title="Nova Reserva">
+                <i class="bi bi-plus-circle"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Cards Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card card-modern text-center">
+                <div class="card-body">
+                    <i class="bi bi-clock-history text-primary" style="font-size: 2rem;"></i>
+                    <h3 class="mt-2" id="totalAtivas">-</h3>
+                    <p class="text-muted mb-0">Ativas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-modern text-center">
+                <div class="card-body">
+                    <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+                    <h3 class="mt-2" id="totalConcluidas">-</h3>
+                    <p class="text-muted mb-0">Concluídas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-modern text-center">
+                <div class="card-body">
+                    <i class="bi bi-x-circle text-danger" style="font-size: 2rem;"></i>
+                    <h3 class="mt-2" id="totalExpiradas">-</h3>
+                    <p class="text-muted mb-0">Expiradas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-modern text-center">
+                <div class="card-body">
+                    <i class="bi bi-list-task text-info" style="font-size: 2rem;"></i>
+                    <h3 class="mt-2" id="totalReservas">-</h3>
+                    <p class="text-muted mb-0">Total</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela -->
+    <div class="card card-modern">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <tr>
+                    <th>ID</th>
+                    <th>Usuário</th>
+                    <th>Livro</th>
+                    <th>Data Reserva</th>
+                    <th>Validade</th>
+                    <th>Status</th>
+                    <th class="text-center">Ações</th>
+                </tr>
+                </thead>
+                <tbody id="tabelaReservas">
+                <tr>
+                    <td class="text-center py-4" colspan="7">
+                        <div class="spinner-border text-primary"></div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nova Reserva -->
+<div class="modal fade" id="modalNovaReserva" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-header"
+                 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="modal-title" id="modalReservaTitulo"><i class="bi bi-plus-circle"></i> Nova Reserva</h5>
+                <button aria-label="Fechar" class="btn-close btn-close-white" data-bs-dismiss="modal" title="Fechar"
+                        type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNovaReserva">
+                    <input id="reservaId" name="id" type="hidden">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="selectUsuarioRes">Usuário</label>
+                        <select class="form-select" id="selectUsuarioRes" name="idUsuario" required>
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="selectLivro">Livro</label>
+                        <select class="form-select" id="selectLivro" name="idLivro" required>
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="campoStatus" style="display: none;">
+                        <label class="form-label fw-bold" for="selectStatus">Status</label>
+                        <select class="form-select" id="selectStatus" name="status">
+                            <option value="ATIVA">Ativa</option>
+                            <option value="CANCELADA">Cancelada</option>
+                        </select>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Validade: 3 dias após a criação
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button aria-label="Cancelar" class="btn btn-secondary" data-bs-dismiss="modal" title="Cancelar"
+                        type="button">
+                    <i class="bi bi-x"></i>
+                </button>
+                <button aria-label="Salvar" class="btn btn-gradient" id="btnSalvarReserva" onclick="salvarReserva()"
+                        title="Salvar" type="button">
+                    <i class="bi bi-save"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/webjars/bootstrap/5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function getStatusBadge(status) {
+        const badges = {
+            'ATIVA': '<span class="badge bg-primary">Ativa</span>',
+            'CONCLUIDA': '<span class="badge bg-success">Concluída</span>',
+            'CANCELADA': '<span class="badge bg-secondary">Cancelada</span>',
+            'EXPIRADA': '<span class="badge bg-danger">Expirada</span>'
+        };
+        return badges[status] || status;
+    }
+
+    function carregarReservas() {
+        fetch('/api/reservas')
+            .then(response => response.json())
+            .then(reservas => {
+                const tbody = document.getElementById('tabelaReservas');
+                tbody.innerHTML = '';
+
+                let ativas = 0, concluidas = 0, expiradas = 0;
+
+                reservas.forEach(res => {
+                    if (res.status === 'ATIVA') ativas++;
+                    if (res.status === 'CONCLUIDA') concluidas++;
+                    if (res.status === 'EXPIRADA') expiradas++;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                            <td>${res.idReserva}</td>
+                            <td>${res.nomeUsuario}</td>
+                            <td>${res.tituloLivro}</td>
+                            <td>${new Date(res.dataReserva).toLocaleString('pt-BR')}</td>
+                            <td>${new Date(res.dataValidade).toLocaleDateString('pt-BR')}</td>
+                            <td>${getStatusBadge(res.status)}</td>
+                            <td class="text-center">
+                                ${res.status === 'ATIVA' ?
+                        `<button class="btn btn-sm btn-warning me-1" onclick="editarReserva(${res.idReserva})" title="Editar" aria-label="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-success me-1" onclick="concluirReserva(${res.idReserva})" title="Concluir" aria-label="Concluir">
+                                        <i class="bi bi-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="cancelarReserva(${res.idReserva})" title="Cancelar" aria-label="Cancelar">
+                                        <i class="bi bi-x"></i>
+                                    </button>` :
+                        '<span class="text-muted">-</span>'
+                    }
+                            </td>
+                        `;
+                    tbody.appendChild(tr);
+                });
+
+                if (reservas.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4">Nenhuma reserva encontrada</td></tr>';
+                }
+
+                document.getElementById('totalAtivas').textContent = ativas;
+                document.getElementById('totalConcluidas').textContent = concluidas;
+                document.getElementById('totalExpiradas').textContent = expiradas;
+                document.getElementById('totalReservas').textContent = reservas.length;
+            });
+    }
+
+    function abrirModalNova() {
+        document.getElementById('modalReservaTitulo').innerHTML = '<i class="bi bi-plus-circle"></i> Nova Reserva';
+        document.getElementById('formNovaReserva').reset();
+        document.getElementById('reservaId').value = '';
+        document.getElementById('campoStatus').style.display = 'none';
+        document.getElementById('btnSalvarReserva').innerHTML = '<i class="bi bi-save"></i> Salvar';
+        new bootstrap.Modal(document.getElementById('modalNovaReserva')).show();
+    }
+
+    function editarReserva(id) {
+        fetch(`/api/reservas/${id}`)
+            .then(response => response.json())
+            .then(reserva => {
+                document.getElementById('modalReservaTitulo').innerHTML = '<i class="bi bi-pencil"></i> Editar Reserva';
+                document.getElementById('reservaId').value = reserva.idReserva;
+                document.getElementById('selectUsuarioRes').value = reserva.idUsuario;
+                document.getElementById('selectLivro').value = reserva.idLivro;
+                document.getElementById('selectStatus').value = reserva.status;
+                document.getElementById('campoStatus').style.display = 'block';
+                document.getElementById('btnSalvarReserva').innerHTML = '<i class="bi bi-save"></i> Atualizar';
+                new bootstrap.Modal(document.getElementById('modalNovaReserva')).show();
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao carregar reserva');
+            });
+    }
+
+    function salvarReserva() {
+        const form = document.getElementById('formNovaReserva');
+        const formData = new FormData(form);
+        const id = document.getElementById('reservaId').value;
+        const isEdicao = id !== '';
+
+        const dados = {
+            idUsuario: parseInt(formData.get('idUsuario')),
+            idLivro: parseInt(formData.get('idLivro'))
+        };
+
+        if (isEdicao) {
+            dados.idReserva = parseInt(id);
+            dados.status = formData.get('status');
+        }
+
+        const url = isEdicao ? '/api/reservas' : '/api/reservas';
+        const method = isEdicao ? 'PUT' : 'POST';
+
+        fetch(url, {
+            method: method,
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(dados)
+        })
+            .then(response => {
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('modalNovaReserva')).hide();
+                    form.reset();
+                    carregarReservas();
+                    alert(isEdicao ? 'Reserva atualizada com sucesso!' : 'Reserva criada com sucesso!');
+                } else {
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
+                }
+            })
+            .catch(error => alert('Erro: ' + error.message));
+    }
+
+    function concluirReserva(id) {
+        if (confirm('Confirmar conclusão da reserva? Um empréstimo será criado automaticamente.')) {
+            fetch(`/api/reservas/${id}/concluir`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            })
+                .then(response => {
+                    if (response.ok) {
+                        carregarReservas();
+                        alert('Reserva concluída e empréstimo criado com sucesso!');
+                    } else {
+                        return response.text().then(text => {
+                            throw new Error(text);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao concluir reserva: ' + error.message);
+                });
+        }
+    }
+
+    function cancelarReserva(id) {
+        if (confirm('Deseja realmente cancelar esta reserva?')) {
+            fetch(`/api/reservas/${id}`, {method: 'DELETE'})
+                .then(() => {
+                    carregarReservas();
+                    alert('Reserva cancelada!');
+                });
+        }
+    }
+
+    // Carregar dados
+    carregarReservas();
+    fetch('/api/usuarios/ativos').then(r => r.json()).then(users => {
+        const sel = document.getElementById('selectUsuarioRes');
+        users.forEach(u => {
+            sel.innerHTML += `<option value="${u.idUsuario}">${u.nome}</option>`;
+        });
+    });
+    fetch('/api/livros').then(
+    r => r.json()
+    ).then(livros => {
+        const sel = document.getElementById('selectLivro');
+        livros.forEach(l => {
+            sel.innerHTML += `<option value="${l.idLivro}">${l.titulo} - ${l.autor}</option>`;
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Login - Sistema de Biblioteca</title>
+    <link href="/webjars/bootstrap/5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/webjars/bootstrap-icons/1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .login-card {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="login-card">
+        <div class="card shadow-lg">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4">
+                    <i class="bi bi-book"></i> Biblioteca
+                </h2>
+                <h5 class="text-center text-muted mb-4">Sistema de Gerenciamento</h5>
+
+                <div class="alert alert-danger" th:if="${param.error}">
+                    Email ou senha inválidos
+                </div>
+
+                <div class="alert alert-success" th:if="${param.logout}">
+                    Logout realizado com sucesso
+                </div>
+
+                <form method="post" th:action="@{/login}">
+                    <div class="mb-3">
+                        <label class="form-label" for="username">Email</label>
+                        <input autofocus class="form-control" id="username" name="username"
+                               placeholder="seu@email.com" required type="email">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="password">Senha</label>
+                        <input class="form-control" id="password" name="password" placeholder="••••••••"
+                               required type="password">
+                    </div>
+
+                    <button class="btn btn-primary w-100 mt-3" type="submit">Entrar</button>
+                </form>
+
+                <hr class="my-4">
+
+                <div class="text-center small text-muted">
+                    <p class="mb-1"><strong>Credenciais de teste:</strong></p>
+                    <p class="mb-0">Admin: admin@biblioteca.com / admin</p>
+                    <p class="mb-0">Usuário: usuario@biblioteca.com / usuario123</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/webjars/bootstrap/5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

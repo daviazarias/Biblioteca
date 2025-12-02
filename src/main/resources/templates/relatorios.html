@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Relatórios - Sistema de Biblioteca</title>
+    <link href="/webjars/bootstrap/5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/webjars/bootstrap-icons/1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Relatórios e Consultas Complexas</h2>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">1. Livros Mais Populares</h5>
+                </div>
+                <div class="card-body">
+                    <p>Top 10 livros por número de empréstimos</p>
+                    <button class="btn btn-primary" onclick="carregarLivrosPopulares()">
+                        <i class="bi bi-graph-up"></i> Gerar Relatório
+                    </button>
+                    <div class="mt-3" id="resultadoPopulares"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">2. Livros Disponíveis por Categoria</h5>
+                </div>
+                <div class="card-body">
+                    <p>Livros disponíveis agrupados por categoria</p>
+                    <button class="btn btn-success" onclick="carregarLivrosDisponiveis()">
+                        <i class="bi bi-book"></i> Gerar Relatório
+                    </button>
+                    <div class="mt-3" id="resultadoDisponiveis"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">3. Empréstimos Atrasados</h5>
+                </div>
+                <div class="card-body">
+                    <p>Empréstimos que ultrapassaram a data de devolução</p>
+                    <button class="btn btn-danger" onclick="carregarEmprestimosAtrasados()">
+                        <i class="bi bi-exclamation-triangle"></i> Gerar Relatório
+                    </button>
+                    <div class="mt-3" id="resultadoAtrasados"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">4. Usuários com Mais Empréstimos</h5>
+                </div>
+                <div class="card-body">
+                    <p>Top 10 usuários por número de empréstimos</p>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <label class="form-label small" for="dataInicio">Data Início</label>
+                            <input class="form-control form-control-sm" id="dataInicio"
+                                   type="date" value="">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small" for="dataFim">Data Fim</label>
+                            <input class="form-control form-control-sm" id="dataFim"
+                                   type="date" value="">
+                        </div>
+                    </div>
+                    <button class="btn btn-info" onclick="carregarUsuariosMaisEmprestimos()">
+                        <i class="bi bi-people"></i> Gerar Relatório
+                    </button>
+                    <div class="mt-3" id="resultadoUsuarios"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 mb-3">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">5. Livros por Empréstimos por Categoria</h5>
+                </div>
+                <div class="card-body">
+                    <p>Total de empréstimos de livros agrupados por categoria</p>
+                    <button class="btn btn-warning" onclick="carregarLivrosPorCategoria()">
+                        <i class="bi bi-bar-chart"></i> Gerar Relatório
+                    </button>
+                    <div class="mt-3" id="resultadoCategorias"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/webjars/bootstrap/5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Definir datas padrão
+    const hoje = new Date().toISOString().split('T')[0];
+    const seisMinutos = new Date();
+    seisMinutos.setMonth(seisMinutos.getMonth() - 6);
+    document.getElementById('dataFim').value = hoje;
+    document.getElementById('dataInicio').value = seisMinutos.toISOString().split('T')[0];
+
+    function carregarLivrosPopulares() {
+        fetch('/api/relatorios/livros-populares')
+            .then(response => response.json())
+            .then(data => {
+                let html = '<div class="table-responsive"><table class="table table-sm table-striped">';
+                html += '<thead><tr><th>Título</th><th>Autor</th><th>Total Empréstimos</th></tr></thead><tbody>';
+
+                data.forEach(row => {
+                    const titulo = row[2] || 'N/A';
+                    const autor = row[3] || 'N/A';
+                    const total = row[row.length - 1] || 0;
+                    html += `<tr><td>${titulo}</td><td>${autor}</td><td><span class="badge bg-primary">${total}</span></td></tr>`;
+                });
+
+                html += '</tbody></table></div>';
+                document.getElementById('resultadoPopulares').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('resultadoPopulares').innerHTML =
+                    '<div class="alert alert-danger">Erro ao carregar dados</div>';
+            });
+    }
+
+    function carregarLivrosDisponiveis() {
+        fetch('/api/relatorios/livros-disponiveis')
+            .then(response => response.json())
+            .then(data => {
+                let html = '<div class="table-responsive"><table class="table table-sm table-striped">';
+                html += '<thead><tr><th>Livro</th><th>Categoria</th><th>Disponíveis</th></tr></thead><tbody>';
+
+                data.forEach(row => {
+                    // row[0] = titulo, row[1] = categoria, row[2] = quantidade
+                    const titulo = row[0] || 'N/A';
+                    const categoria = row[1] || 'Sem categoria';
+                    const qtd = row[2] || 0;
+                    html += `<tr><td>${titulo}</td><td>${categoria}</td><td><span class="badge bg-success">${qtd}</span></td></tr>`;
+                });
+
+                html += '</tbody></table></div>';
+                document.getElementById('resultadoDisponiveis').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('resultadoDisponiveis').innerHTML =
+                    '<div class="alert alert-danger">Erro ao carregar dados</div>';
+            });
+    }
+
+    function carregarEmprestimosAtrasados() {
+        fetch('/api/relatorios/emprestimos-atrasados')
+            .then(response => response.json())
+            .then(data => {
+                let html = '<div class="table-responsive"><table class="table table-sm table-striped">';
+                html += '<thead><tr><th>Usuário</th><th>Livro</th><th>Data Prev.</th><th>Dias Atraso</th></tr></thead><tbody>';
+
+                data.forEach(row => {
+                    const usuario = row[row.length - 3] || 'N/A';
+                    const livro = row[row.length - 2] || 'N/A';
+                    const dataPrev = row[4] ? new Date(row[4]).toLocaleDateString('pt-BR') : 'N/A';
+                    const diasAtraso = row[row.length - 1] || 0;
+                    html += `<tr><td>${usuario}</td><td>${livro}</td><td>${dataPrev}</td>
+                                <td><span class="badge bg-danger">${diasAtraso} dias</span></td></tr>`;
+                });
+
+                if (data.length === 0) {
+                    html += '<tr><td colspan="4" class="text-center">Nenhum empréstimo atrasado</td></tr>';
+                }
+
+                html += '</tbody></table></div>';
+                document.getElementById('resultadoAtrasados').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('resultadoAtrasados').innerHTML =
+                    '<div class="alert alert-danger">Erro ao carregar dados</div>';
+            });
+    }
+
+    function carregarUsuariosMaisEmprestimos() {
+        const dataInicio = document.getElementById('dataInicio').value;
+        const dataFim = document.getElementById('dataFim').value;
+
+        fetch(`/api/relatorios/usuarios-mais-emprestimos?dataInicio=${dataInicio}&dataFim=${dataFim}`)
+            .then(response => response.json())
+            .then(data => {
+                let html = '<div class="table-responsive"><table class="table table-sm table-striped">';
+                html += '<thead><tr><th>Nome</th><th>Email</th><th>Total Empréstimos</th></tr></thead><tbody>';
+
+                data.forEach(row => {
+                    const nome = row[4] || 'N/A';
+                    const email = row[3] || 'N/A';
+                    const total = row[row.length - 1] || 0;
+                    html += `<tr><td>${nome}</td><td>${email}</td>
+                                <td><span class="badge bg-info">${total}</span></td></tr>`;
+                });
+
+                html += '</tbody></table></div>';
+                document.getElementById('resultadoUsuarios').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('resultadoUsuarios').innerHTML =
+                    '<div class="alert alert-danger">Erro ao carregar dados</div>';
+            });
+    }
+
+    function carregarLivrosPorCategoria() {
+        fetch('/api/relatorios/livros-por-categoria')
+            .then(response => response.json())
+            .then(data => {
+                let html = '<div class="table-responsive"><table class="table table-sm table-striped">';
+                html += '<thead><tr><th>Livro</th><th>Categoria</th><th>Total Empréstimos</th></tr></thead><tbody>';
+
+                data.forEach(row => {
+                    const titulo = row[2] || 'N/A';
+                    const categoria = row[row.length - 2] || 'Sem categoria';
+                    const total = row[row.length - 1] || 0;
+                    html += `<tr><td>${titulo}</td><td>${categoria}</td>
+                                <td><span class="badge bg-warning text-dark">${total}</span></td></tr>`;
+                });
+
+                html += '</tbody></table></div>';
+                document.getElementById('resultadoCategorias').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('resultadoCategorias').innerHTML =
+                    '<div class="alert alert-danger">Erro ao carregar dados</div>';
+            });
+    }
+</script>
+</body>
+</html>

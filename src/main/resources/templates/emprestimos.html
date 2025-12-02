@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Empréstimos - Sistema de Biblioteca</title>
+    <link href="/webjars/bootstrap/5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/webjars/bootstrap-icons/1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gerenciar Empréstimos</h2>
+        <button aria-label="Novo Empréstimo" class="btn btn-primary" data-bs-target="#modalNovoEmprestimo"
+                data-bs-toggle="modal" title="Novo Empréstimo">
+            <i class="bi bi-plus-circle"></i>
+        </button>
+    </div>
+
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#todos">Todos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#ativos">Ativos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#atraso">Atrasados</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="todos">
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuário</th>
+                            <th>Livro</th>
+                            <th>Data Empréstimo</th>
+                            <th>Devolução Prevista</th>
+                            <th>Devolução Real</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabelaTodosEmprestimos">
+                        <tr>
+                            <td class="text-center" colspan="8">Carregando...</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="ativos">
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuário</th>
+                            <th>Livro</th>
+                            <th>Data Empréstimo</th>
+                            <th>Devolução Prevista</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabelaAtivosEmprestimos">
+                        <tr>
+                            <td class="text-center" colspan="7">Carregando...</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="atraso">
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuário</th>
+                            <th>Livro</th>
+                            <th>Data Empréstimo</th>
+                            <th>Devolução Prevista</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabelaatrasoEmprestimos">
+                        <tr>
+                            <td class="text-center" colspan="7">Carregando...</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Novo Empréstimo -->
+<div class="modal fade" id="modalNovoEmprestimo" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Novo Empréstimo</h5>
+                <button aria-label="Fechar" class="btn-close" data-bs-dismiss="modal" title="Fechar"
+                        type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNovoEmprestimo">
+                    <div class="mb-3">
+                        <label class="form-label" for="selectUsuario">Usuário</label>
+                        <select class="form-select" id="selectUsuario" name="idUsuario" required>
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="selectLivro">Livro</label>
+                        <select class="form-select" id="selectLivro" name="idLivro" required>
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="dataDevolucaoPrevista">Data de Devolução Prevista</label>
+                        <input class="form-control" id="dataDevolucaoPrevista" name="dataDevolucaoPrevista" required type="date">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button aria-label="Cancelar" class="btn btn-secondary" data-bs-dismiss="modal" title="Cancelar"
+                        type="button">
+                    <i class="bi bi-x"></i>
+                </button>
+                <button aria-label="Salvar" class="btn btn-primary" onclick="salvarEmprestimo()" title="Salvar"
+                        type="button">
+                    <i class="bi bi-save"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/webjars/bootstrap/5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function formatarData(dataStr) {
+        if (!dataStr) return '-';
+        return new Date(dataStr).toLocaleDateString('pt-BR');
+    }
+
+    function getStatusBadge(status) {
+        const badges = {
+            'ATIVO': '<span class="badge bg-info">Ativo</span>',
+            'DEVOLVIDO': '<span class="badge bg-success">Devolvido</span>',
+            'ATRASADO': '<span class="badge bg-danger">Atrasado</span>'
+        };
+        return badges[status] || status;
+    }
+
+    function renderBotaoDevolver(emp) {
+        if (emp.status === 'ATIVO' || emp.status === 'ATRASADO') {
+            return `<button class="btn btn-sm btn-success" onclick="devolverLivro(${emp.idEmprestimo})" title="Devolver" aria-label="Devolver">
+                        <i class="bi bi-check-circle"></i>
+                    </button>`;
+        }
+        return '';
+    }
+
+    function nomeUsuarioComBadge(emp) {
+        const badge = emp.usuarioBloqueadoPorMultas ? ' <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>Multas</span>' : '';
+        return `${emp.nomeUsuario}${badge}`;
+    }
+
+    function carregarTodosEmprestimos() {
+        fetch('/api/emprestimos')
+            .then(response => response.json())
+            .then(emprestimos => {
+                const tbody = document.getElementById('tabelaTodosEmprestimos');
+                tbody.innerHTML = '';
+
+                emprestimos.forEach(emp => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                            <td>${emp.idEmprestimo}</td>
+                            <td>${nomeUsuarioComBadge(emp)}</td>
+                            <td>${emp.tituloLivro}</td>
+                            <td>${formatarData(emp.dataEmprestimo)}</td>
+                            <td>${formatarData(emp.dataDevolucaoPrevista)}</td>
+                            <td>${formatarData(emp.dataDevolucaoReal)}</td>
+                            <td>${getStatusBadge(emp.status)}</td>
+                            <td>${renderBotaoDevolver(emp)}</td>`;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+
+    function carregarAtivosEmprestimos() {
+        fetch('/api/emprestimos/ativos')
+            .then(response => response.json())
+            .then(emprestimos => {
+                const tbody = document.getElementById('tabelaAtivosEmprestimos');
+                tbody.innerHTML = '';
+
+                emprestimos.forEach(emp => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                            <td>${emp.idEmprestimo}</td>
+                            <td>${nomeUsuarioComBadge(emp)}</td>
+                            <td>${emp.tituloLivro}</td>
+                            <td>${formatarData(emp.dataEmprestimo)}</td>
+                            <td>${formatarData(emp.dataDevolucaoPrevista)}</td>
+                            <td>${getStatusBadge(emp.status)}</td>
+                            <td>
+                                <button class="btn btn-sm btn-success" onclick="devolverLivro(${emp.idEmprestimo})" title="Devolver" aria-label="Devolver">
+                                    <i class="bi bi-check-circle"></i>
+                                </button>
+                            </td>
+                        `;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+
+    function carregarAtrasoEmprestimos() {
+        fetch('/api/emprestimos/atraso')
+            .then(response => response.json())
+            .then(emprestimos => {
+                const tbody = document.getElementById('tabelaatrasoEmprestimos');
+                tbody.innerHTML = '';
+
+                emprestimos.forEach(emp => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                            <td>${emp.idEmprestimo}</td>
+                            <td>${nomeUsuarioComBadge(emp)}</td>
+                            <td>${emp.tituloLivro}</td>
+                            <td>${formatarData(emp.dataEmprestimo)}</td>
+                            <td>${formatarData(emp.dataDevolucaoPrevista)}</td>
+                            <td>${getStatusBadge(emp.status)}</td>
+                            <td>
+                                <button class="btn btn-sm btn-success" onclick="devolverLivro(${emp.idEmprestimo})" title="Devolver" aria-label="Devolver">
+                                    <i class="bi bi-check-circle"></i>
+                                </button>
+                            </td>
+                        `;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+
+    function carregarUsuarios() {
+        fetch('/api/usuarios/ativos')
+            .then(response => response.json())
+            .then(usuarios => {
+                const select = document.getElementById('selectUsuario');
+                select.innerHTML = '<option value="">Selecione...</option>';
+                usuarios.forEach(u => {
+                    const option = document.createElement('option');
+                    option.value = u.idUsuario;
+                    option.textContent = `${u.nome} (${u.email})`;
+                    select.appendChild(option);
+                });
+            });
+    }
+
+    function carregarLivrosDisponiveis() {
+        fetch('/api/livros/disponiveis')
+            .then(response => response.json())
+            .then(livros => {
+                const select = document.getElementById('selectLivro');
+                select.innerHTML = '<option value="">Selecione...</option>';
+                livros.forEach(l => {
+                    const option = document.createElement('option');
+                    option.value = l.idLivro;
+                    option.textContent = `${l.titulo} - ${l.autor} (${l.quantidadeDisponivel} disponível)`;
+                    select.appendChild(option);
+                });
+            });
+    }
+
+    function salvarEmprestimo() {
+        const form = document.getElementById('formNovoEmprestimo');
+        const formData = new FormData(form);
+
+        const emprestimo = {
+            idUsuario: parseInt(formData.get('idUsuario')),
+            idLivro: parseInt(formData.get('idLivro')),
+            dataDevolucaoPrevista: formData.get('dataDevolucaoPrevista')
+        };
+
+        fetch('/api/emprestimos', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(emprestimo)
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Empréstimo registrado com sucesso!');
+                    bootstrap.Modal.getInstance(document.getElementById('modalNovoEmprestimo')).hide();
+                    form.reset();
+                    carregarTodosEmprestimos();
+                    carregarAtivosEmprestimos();
+                } else {
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao registrar empréstimo: ' + error.message);
+            });
+    }
+
+    function devolverLivro(id) {
+        if (confirm('Confirmar devolução do livro?')) {
+            fetch(`/api/emprestimos/${id}/devolver`, {method: 'PATCH'})
+                .then(response => {
+                    if (response.ok) {
+                        alert('Devolução registrada!');
+                        carregarTodosEmprestimos();
+                        carregarAtivosEmprestimos();
+                        carregarAtrasoEmprestimos();
+                    }
+                })
+                .catch(error => alert('Erro ao registrar devolução'));
+        }
+    }
+
+    // Carregar ao iniciar
+    carregarTodosEmprestimos();
+    carregarAtivosEmprestimos();
+    carregarAtrasoEmprestimos();
+    carregarUsuarios();
+    carregarLivrosDisponiveis();
+</script>
+</body>
+</html>

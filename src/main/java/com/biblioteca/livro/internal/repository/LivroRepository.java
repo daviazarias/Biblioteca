@@ -17,7 +17,7 @@ public interface LivroRepository extends JpaRepository<Livro, Long> {
     List<Livro> findByQuantidadeDisponivelGreaterThan(Integer quantidade);
 
     @Query("SELECT l FROM Livro l WHERE l.titulo LIKE %:termo% OR l.autor LIKE %:termo%")
-    List<Livro> buscarPorTituloOuAutor(@Param("termo") String termo);
+    List<Object> buscarPorTituloOuAutor(@Param("termo") String termo);
 
     @Query(value = """
             SELECT l.titulo, c.nome as categoria_nome, COUNT(e.id_emprestimo) as total_emprestimos

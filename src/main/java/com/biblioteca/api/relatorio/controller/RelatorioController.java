@@ -52,4 +52,11 @@ public class RelatorioController {
 
         return ResponseEntity.ok(usuarioService.obterUsuariosComMaisEmprestimos(inicio, fim));
     }
+
+    @GetMapping("/busca")
+    public ResponseEntity<List<Object>> getLivrosPorPesquisa(
+            @RequestParam String search
+    ) {
+        return ResponseEntity.ok(livroService.obterLivrosPorPesquisa(search));
+    }
 }

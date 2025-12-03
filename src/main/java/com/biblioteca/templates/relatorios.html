@@ -90,6 +90,10 @@
                 <button class="sidebar-item" onclick="carregarRelatorio('categorias')" type="button">
                     <i class="bi bi-collection-fill"></i> Empréstimos por Categoria
                 </button>
+
+                <button class="sidebar-item" onclick="carregarRelatorio('busca')" type="button">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Buscar Livros
+                </button>
             </div>
         </div>
 
@@ -143,6 +147,9 @@
                 break;
             case 'categorias':
                 carregarLivrosPorCategoria();
+                break;
+            case 'busca':
+                carregarLivrosPorBusca();
                 break;
         }
     }
@@ -384,6 +391,51 @@
                                 <td><span class="badge bg-secondary">${categoria}</span></td>
                                 <td class="text-center">
                                     <span class="badge bg-warning text-dark fs-6">${total}</span>
+                                </td>
+                            </tr>
+                        `;
+                });
+
+                html += '</tbody></table></div>';
+                document.getElementById('relatorioConteudo').innerHTML = html;
+            });
+    }
+
+    function carregarLivrosPorBusca() {
+        const busca = "";
+        fetch(`/api/relatorios/busca?search=${busca}`)
+            .then(response => response.json())
+            .then(data => {
+                let html = `
+                        <div class="report-header">
+                            <h3><i class="bi bi-people-fill text-info"></i> Top 10 Usuários com Mais Empréstimos</h3>
+                            <p class="text-muted mb-0">Últimos 6 meses</p>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead style="background: #f8f9fa;">
+                                    <tr>
+                                        <th>Posição</th>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th class="text-center">Total de Empréstimos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                data.forEach((row, index) => {
+                    const nome = row[1] || 'N/A';
+                    const email = row[2] || 'N/A';
+                    const total = row[row.length - 1] || 0;
+
+                    html += `
+                            <tr>
+                                <td class="fw-bold">${index + 1}º</td>
+                                <td>${nome}</td>
+                                <td><small>${email}</small></td>
+                                <td class="text-center">
+                                    <span class="badge bg-info fs-6">${total}</span>
                                 </td>
                             </tr>
                         `;

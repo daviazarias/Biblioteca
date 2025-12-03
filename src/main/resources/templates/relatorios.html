@@ -100,6 +100,30 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">6. Buscar Livros</h5>
+                </div>
+                <div class="card-body">
+                    <p>Buscar livro por nome do autor ou título da obra</p>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <label class="form-label small" for="busca">Pesquisar:</label>
+                            <input type="search" class="form-control form-control-sm" id="busca" name="query" placeholder="Pesquisar...">
+                        </div>
+
+                        <button class="btn btn-secondary" onclick="carregarLivrosPorBusca()">
+                            <i class="bi bi-book"></i> Gerar Relatório
+                        </button>
+                    </div>
+
+                    <div class="mt-3" id="resultadoLivros"></div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -212,6 +236,48 @@
             .catch(error => {
                 document.getElementById('resultadoUsuarios').innerHTML =
                     '<div class="alert alert-danger">Erro ao carregar dados</div>';
+            });
+    }
+
+    function carregarLivrosPorBusca() {
+        const busca = document.getElementById('busca').value;
+        fetch(`/api/relatorios/busca?search=${busca}`)
+            .then(response => response.json())
+            .then(data => {
+                let html = `
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead style="background: #f8f9fa;">
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Autor</th>
+                                        <th>Ano de publicação</th>
+                                        <th>Quantidade disponível</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                data.forEach(row => {
+                    const titulo = row['titulo'] || 'N/A';
+                    const autor = row['autor'] || 'N/A';
+                    const anoPublicacao = row['anoPublicacao'] || 0;
+                    const qtdDisponivel = row['quantidadeDisponivel'] || 0;
+
+                    html += `
+                            <tr>
+                                <td>${titulo}</td>
+                                <td>${autor}</td>
+                                <td><small>${anoPublicacao}</small></td>
+                                <td class="text-center">
+                                    <span class="badge bg-info fs-6">${qtdDisponivel}</span>
+                                </td>
+                            </tr>
+                        `;
+                });
+
+                html += '</tbody></table></div>';
+                document.getElementById('resultadoLivros').innerHTML = html;
             });
     }
 

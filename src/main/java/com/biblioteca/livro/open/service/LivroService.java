@@ -124,4 +124,9 @@ public class LivroService {
     public List<Object[]> obterLivrosDisponiveisPorCategoria() {
         return livroRepository.findLivrosDisponiveisPorCategoria();
     }
+
+    @Transactional(readOnly = true)
+    public List<Object> obterLivrosPorPesquisa(String search){
+        return livroRepository.buscarPorTituloOuAutor(search);
+    }
 }

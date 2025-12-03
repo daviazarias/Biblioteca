@@ -87,9 +87,9 @@ const UsuariosApp = {
         if (isEdicao) usuario.ativo = formData.get('ativo') === 'true';
 
         const url = isEdicao ? `/api/usuarios/${id}` : '/api/usuarios';
-        const method = isEdicao ? 'PUT' : 'POST';
+        const _method = isEdicao ? 'PUT' : 'POST';
 
-        fetch(url, {method, headers: {'Content-Type': 'application/json'}, body: JSON.stringify(usuario)})
+        fetch(url, {method: _method, headers: {'Content-Type': 'application/json'}, body: JSON.stringify(usuario)})
             .then(response => {
                 if (response.ok) {
                     BibliotecaUtils.mostrarSucesso(isEdicao ? 'Usuário atualizado com sucesso!' : 'Usuário criado com sucesso!');

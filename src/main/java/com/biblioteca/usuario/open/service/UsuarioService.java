@@ -111,6 +111,7 @@ public class UsuarioService {
         usuario.setNome(dto.nome());
         usuario.setEmail(dto.email());
         usuario.setTipoUsuario(dto.tipoUsuario());
+        usuario.setAtivo(dto.ativo());
 
         usuarioRepository.save(usuario);
         UsuarioDTO resp = usuarioMapper.toDTO(usuario);
